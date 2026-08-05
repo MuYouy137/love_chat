@@ -1639,7 +1639,8 @@
     }
 
     function sendSinglePartnerMessage() {
-        const stickerChance = 0.30 + Math.random() * 0.10;
+        // ===== 🔥 表情包概率改为 20%（原来是 30%-40%） =====
+        const stickerChance = 0.15 + Math.random() * 0.05;  // 15%~20%
         const shouldSendSticker = autoStickerEnabled && stickerLibrary.length > 0 && Math.random() < stickerChance;
         
         if (shouldSendSticker) {
@@ -1859,18 +1860,18 @@
         return container;
     }
 
-    // ===== 核心修改：第一次发消息强制显示时间戳，并保存时间戳到 localStorage =====
+    // ===== 📌 核心修改：第一次发消息强制显示时间戳 =====
     function addStandardMessage(content, isSent, isRead, replyData, customFullTimestamp = null) {
         // 如果当前是空状态（只有 empty-state），清空并重置 lastTimeSlotKey
         if (chatMessagesDiv.querySelector('.empty-state')) {
             chatMessagesDiv.innerHTML = '';
-            lastTimeSlotKey = '';
+            lastTimeSlotKey = '';  // 🔥 重置，让下一条消息显示时间戳
         }
         
         let fullTimestamp = customFullTimestamp || getFullTimestamp();
         let timeSlotKey = getTimeSlotKey(fullTimestamp, TIME_DIVIDER_INTERVAL);
 
-        // 如果 lastTimeSlotKey 为空（第一条消息），强制显示时间戳
+        // 🔥 关键改动：如果 lastTimeSlotKey 为空（第一条消息），强制显示时间戳
         if (!lastTimeSlotKey || timeSlotKey !== lastTimeSlotKey) {
             const divider = createTimeDivider(fullTimestamp);
             chatMessagesDiv.appendChild(divider);
@@ -1981,7 +1982,15 @@
         updateAvatarsVisibility();
     }
 
+    // ============================================================
+    // 🔥 核心修改：对方自动回复 + 30% 概率不回消息
+    // ============================================================
     function sendPartnerAutoMessage() {
+        // 30% 概率不回消息
+        if (Math.random() < 0.3) {
+            return;
+        }
+
         if (!autoReplyEnabled && !autoStickerEnabled) return;
         if (isSendingBatch) return;
         
